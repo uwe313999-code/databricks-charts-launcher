@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Databricks Charts – Anmeldung</title></head>
+<body>Weiterleitung zur Anmeldung …
+<script src="config.js"></script>
+<script>
+  // Dialog start page (must be the launcher's own origin); hands over to the app's sign-in target page, which the
+  // Databricks proxy serves only after the workspace sign-in.
+  var app = String((window.DBX_LAUNCHER || {}).app || '').replace(/\/+$/, '');
+  if (app) location.replace(app + '/login-done.html?parent=' + encodeURIComponent(location.origin));
+  else document.body.textContent = 'config.js: Adresse der App fehlt.';
+</script>
+</body></html>
