@@ -4,4 +4,6 @@
 window.DBX_LAUNCHER = {
   app: "https://ppt-charts-7405617839372873.13.azure.databricksapps.com",
   silentCheckMs: 2500,
+  // Office im Web: Wartezeit je Anmeldeversuch im Aufgabenbereich (die Umleitungskette über Entra braucht Sekunden).
+  webCheckMs: 8000,
 };
