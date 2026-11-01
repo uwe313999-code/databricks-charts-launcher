@@ -93,5 +93,6 @@
 
   document.getElementById('login').onclick = function () { start(false); };
   document.getElementById('open').onclick = function () { go(); };
-  Office.onReady(function (info) { platform = info.platform; log('Office bereit', info.host, info.platform); start(true); });
+  document.getElementById('diag').onclick = function () { done = true; status('Diagnose wird geladen …'); window.location.href = APP + '/diag.html'; };
+  Office.onReady(function (info) { platform = info.platform; log('Office bereit', info.host, info.platform); start(true); setTimeout(function () { if (!done) actions.hidden = false; }, 4000); });
 })();
