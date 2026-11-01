@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Databricks Charts – Office-Add-in-Manifest (Launcher-Variante, APP1). Platzhalter: scripts/launcher-manifest.mjs
+  füllt sie; ohne Node von Hand ersetzen: 9c2e7b41-5d8a-4f36-b1e0-7a4c93d2e5f8 (GUID), Databricks Charts, https://uwe313999-code.github.io/databricks-charts-launcher/launcher.html (…/launcher.html), https://uwe313999-code.github.io
+  (https://host), https://ppt-charts-7405617839372873.13.azure.databricksapps.com (Databricks App, ohne Pfad), https://adb-7405617839372873.13.azuredatabricks.net (https://adb-….azuredatabricks.net).
+  Die Anmeldedomains am Ende ggf. um den Identity Provider des Unternehmens ergänzen.
+-->
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:type="TaskPaneApp">
+  <Id>9c2e7b41-5d8a-4f36-b1e0-7a4c93d2e5f8</Id>
+  <Version>0.1.0</Version>
+  <ProviderName>Implicit</ProviderName>
+  <DefaultLocale>de-DE</DefaultLocale>
+  <DisplayName DefaultValue="Databricks Charts"/>
+  <Description DefaultValue="Diagramme und Kennzahlen aus Databricks Metric Views in PowerPoint."/>
+  <IconUrl DefaultValue="https://uwe313999-code.github.io/databricks-charts-launcher/assets/icon-32.png"/>
+  <SupportUrl DefaultValue="https://ppt-charts-7405617839372873.13.azure.databricksapps.com/"/>
+  <AppDomains>
+    <AppDomain>https://uwe313999-code.github.io</AppDomain>
+    <AppDomain>https://ppt-charts-7405617839372873.13.azure.databricksapps.com</AppDomain>
+    <AppDomain>https://adb-7405617839372873.13.azuredatabricks.net</AppDomain>
+    <AppDomain>https://login.microsoftonline.com</AppDomain>
+    <AppDomain>https://login.microsoft.com</AppDomain>
+    <AppDomain>https://login.live.com</AppDomain>
+    <AppDomain>https://accounts.azuredatabricks.net</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Presentation"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://uwe313999-code.github.io/databricks-charts-launcher/launcher.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
