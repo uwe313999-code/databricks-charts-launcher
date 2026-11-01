@@ -17,7 +17,9 @@
   function log() { var parts = []; for (var i = 0; i < arguments.length; i++) parts.push(typeof arguments[i] === 'string' ? arguments[i] : JSON.stringify(arguments[i])); out.textContent += '\n' + parts.join(' '); }
   function status(text) { statusEl.textContent = text; }
   function isLoginOk(origin, message) { return message === 'login-ok' && (!origin || origin === APP); }
-  function go() { if (done) return; done = true; status('Angemeldet – Databricks Charts wird geladen …'); window.location.href = APP + '/taskpane.html'; }
+  // ?mode=diag (manifest „Databricks Charts (Diagnose)“): after sign-in open the app's diagnostics page instead of the pane.
+  var TARGET = /[?&]mode=diag(?:&|$)/.test(window.location.search) ? '/diag.html' : '/taskpane.html';
+  function go() { if (done) return; done = true; status('Angemeldet – ' + (TARGET === '/diag.html' ? 'Diagnose' : 'Databricks Charts') + ' wird geladen …'); window.location.href = APP + TARGET; }
 
   // (1) Already signed in? The app's session-check page answers "login-ok" only when the proxy let it through.
   function silentCheck(ms) {
