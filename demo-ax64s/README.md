@@ -1,9 +1,9 @@
 # Launcher – Umgebung demo-ax64s
 
-Platzhalter: Die App-Adresse ist noch nicht eingetragen (`config.js`: `app: ""`), die Seite meldet „Adresse der App fehlt“.
+App: https://dbxpowerpoint-407324107611976.16.azure.databricksapps.com (in `config.js` und in der CSP `frame-src` von `launcher.html`).
 
-Launcher-URL für das Notebook (Feld 6):
+Launcher-URL (Notebook Feld 6, Manifest SourceLocation):
 https://uwe313999-code.github.io/databricks-charts-launcher/demo-ax64s/launcher.html
 
-Nach dem Notebook-Lauf (Nur prüfen = nein) den Inhalt von `/Workspace/Users/<du>/<app-name>-installer/launcher/`
-hier hinein kopieren (überschreibt diese Dateien, gleiche Struktur). Der Launcher im Hauptordner bleibt unverändert.
+Die App muss diese Herkunft in `LAUNCHER_ORIGINS` erlauben: https://uwe313999-code.github.io
+Der Launcher im Hauptordner bleibt unverändert.
