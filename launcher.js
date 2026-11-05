@@ -9,8 +9,6 @@
   // Office on the web: the check runs the whole sign-in redirect chain inside the pane's cookie partition – give it time.
   var WEB_CHECK_MS = typeof cfg.webCheckMs === 'number' && cfg.webCheckMs > 0 ? cfg.webCheckMs : 8000;
   var platform = null;
-  // Test hook (SEC1d): only with an explicit config flag; the production config.js does not set it.
-  if (cfg.exposeForTest === true) window.DBX_LAUNCHER_TEST = { isLoginOk: function (origin, message) { return isLoginOk(origin, message); } };
   var out = document.getElementById('out');
   var statusEl = document.getElementById('status');
   var actions = document.getElementById('actions');
@@ -18,10 +16,7 @@
 
   function log() { var parts = []; for (var i = 0; i < arguments.length; i++) parts.push(typeof arguments[i] === 'string' ? arguments[i] : JSON.stringify(arguments[i])); out.textContent += '\n' + parts.join(' '); }
   function status(text) { statusEl.textContent = text; }
-  // SEC1d (R3 N4): the origin is mandatory; a message without origin or from another origin is ignored.
-  // Dialog messages: a present origin must be the app (DialogOrigin 1.1); hosts without that requirement set send none
-  // and are accepted (same rule as the pane's dialog host, D068/W71). The iframe path checks event.origin separately.
-  function isLoginOk(origin, message) { return message === 'login-ok' && (origin === undefined || origin === null || origin === '' || origin === APP); }
+  function isLoginOk(origin, message) { return message === 'login-ok' && (!origin || origin === APP); }
   // ?mode=diag (manifest „Databricks Charts (Diagnose)“): after sign-in open the app's diagnostics page instead of the pane.
   var TARGET = /[?&]mode=diag(?:&|$)/.test(window.location.search) ? '/diag.html' : '/taskpane.html';
   function go() { if (done) return; done = true; status('Angemeldet – ' + (TARGET === '/diag.html' ? 'Diagnose' : 'Databricks Charts') + ' wird geladen …'); window.location.href = APP + TARGET; }
@@ -42,43 +37,16 @@
   }
 
   // (2) Sign-in in an Office dialog (a top-level window; the Microsoft sign-in refuses the task pane).
-  // The dialog normally ends on the app's login-done page, which sends "login-ok". Benutzerbefund 05.11.: after the Databricks
-  // sign-in the window sometimes shows another page of the app and stays open until it is closed by hand. So while the dialog is
-  // open the launcher also checks the session itself (hidden frame, same check as step 1) and closes the window as soon as the
-  // sign-in is complete – whatever page the dialog shows.
-  var POLL_FIRST_MS = typeof cfg.dialogPollFirstMs === 'number' && cfg.dialogPollFirstMs >= 0 ? cfg.dialogPollFirstMs : 4000;
-  var POLL_EVERY_MS = typeof cfg.dialogPollEveryMs === 'number' && cfg.dialogPollEveryMs > 0 ? cfg.dialogPollEveryMs : 2500;
   function openDialog() {
     return new Promise(function (resolve) {
       var url = new URL('go.html', window.location.href).href;
-      var dialog = null;
-      var ended = false;
-      var pollTimer = null;
-      function end(ok, close) {
-        if (ended) return;
-        ended = true;
-        clearTimeout(pollTimer);
-        if (close && dialog) { try { dialog.close(); } catch (e) { log('Dialog schließen', String(e && e.message || e)); } }
-        resolve(ok);
-      }
-      function poll() {
-        if (ended) return;
-        silentCheck(Math.max(CHECK_MS, 2500)).then(function (ok) {
-          if (ended) return;
-          if (ok) { log('Anmeldung erkannt – Anmeldefenster wird geschlossen'); end(true, true); return; }
-          pollTimer = setTimeout(poll, POLL_EVERY_MS);
-        });
-      }
       Office.context.ui.displayDialogAsync(url, { height: 60, width: 40 }, function (res) {
-        if (res.status !== Office.AsyncResultStatus.Succeeded) { log('Dialog-Fehler', res.error.code, res.error.message); end(false, false); return; }
-        dialog = res.value;
+        if (res.status !== Office.AsyncResultStatus.Succeeded) { log('Dialog-Fehler', res.error.code, res.error.message); resolve(false); return; }
+        var dialog = res.value;
         dialog.addEventHandler(Office.EventType.DialogMessageReceived, function (arg) {
-          if (isLoginOk(arg.origin, arg.message)) end(true, true); else log('Nachricht vom Dialog', arg.origin || '', arg.message);
+          if (isLoginOk(arg.origin, arg.message)) { dialog.close(); resolve(true); } else log('Nachricht vom Dialog', arg.origin || '', arg.message);
         });
-        dialog.addEventHandler(Office.EventType.DialogEventReceived, function (arg) { log('Dialog-Ereignis', arg.error); end(false, false); });
-        // Not on the web: there the session check runs the Databricks sign-in itself inside the pane; repeated checks while the user
-        // signs in in the dialog start competing sign-ins and Databricks answers one of them with "Login error" (Benutzerbefund 05.11.).
-        if (platform !== 'OfficeOnline') pollTimer = setTimeout(poll, POLL_FIRST_MS);
+        dialog.addEventHandler(Office.EventType.DialogEventReceived, function (arg) { log('Dialog-Ereignis', arg.error); resolve(false); });
       });
     });
   }
