@@ -63,7 +63,7 @@
       }
       function poll() {
         if (ended) return;
-        silentCheck(platform === 'OfficeOnline' ? Math.max(CHECK_MS, WEB_CHECK_MS) : Math.max(CHECK_MS, 2500)).then(function (ok) {
+        silentCheck(Math.max(CHECK_MS, 2500)).then(function (ok) {
           if (ended) return;
           if (ok) { log('Anmeldung erkannt – Anmeldefenster wird geschlossen'); end(true, true); return; }
           pollTimer = setTimeout(poll, POLL_EVERY_MS);
@@ -76,7 +76,9 @@
           if (isLoginOk(arg.origin, arg.message)) end(true, true); else log('Nachricht vom Dialog', arg.origin || '', arg.message);
         });
         dialog.addEventHandler(Office.EventType.DialogEventReceived, function (arg) { log('Dialog-Ereignis', arg.error); end(false, false); });
-        pollTimer = setTimeout(poll, POLL_FIRST_MS);
+        // Not on the web: there the session check runs the Databricks sign-in itself inside the pane; repeated checks while the user
+        // signs in in the dialog start competing sign-ins and Databricks answers one of them with "Login error" (Benutzerbefund 05.11.).
+        if (platform !== 'OfficeOnline') pollTimer = setTimeout(poll, POLL_FIRST_MS);
       });
     });
   }
